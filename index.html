@@ -1,0 +1,214 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="mindar-image-three.prod.js"></script>
+
+    <style>
+      html, body {position: relative; margin: 0; width: 100%; height: 100%; overflow: hidden;}
+      button, img {
+        position: absolute;
+        cursor: pointer;
+        z-index: 9999;
+      }
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        color: #fff;
+        background-color: #000;
+        border: none;
+        border-radius: 5px;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      button:hover {
+        background-color: #444;
+      }
+      #lubricant-finder-img {
+        width: 290px; /* Adjust the width as needed */
+        height: auto; /* Maintain aspect ratio */
+        bottom: 10px; /* Position at the bottom */
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      #more-info-img {
+        width: 290px; /* Adjust the width as needed */
+        height: auto; /* Maintain aspect ratio */
+        bottom: 80px; /* Position above the Lubricant Finder button */
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      /* Styles for the top-left images */
+      .top-left {
+        top: 20px;
+        left: 0px;
+        width: 200px; /* Adjust the width as needed */
+        height: auto; /* Maintain aspect ratio */
+        display: none; /* Initially hidden */
+      }
+      /* Styles for the top-right images */
+      .top-right {
+        top: 20px;
+        right: 0px;
+        width: 200px; /* Adjust the width as needed */
+        height: auto; /* Maintain aspect ratio */
+        display: none; /* Initially hidden */
+      }
+    </style>
+  </head>
+  <body>
+    <script type="module">
+      import {loadGLTF} from "./loader.js";
+      const THREE = window.MINDAR.IMAGE.THREE;
+
+      document.addEventListener('DOMContentLoaded', () => {
+        // Create the Lubricant Finder image button
+        const lubricantImage = document.createElement("img");
+        lubricantImage.src = "Button Design-06.webp"; // Replace with the path to your PNG image
+        lubricantImage.id = "lubricant-finder-img";
+        lubricantImage.addEventListener("click", () => {
+          window.location.href = "https://psopk.com/en/lubricants/lubricant-finder";
+        });
+        document.body.appendChild(lubricantImage);
+
+        // Create the More Information image button
+        const moreInfoImage = document.createElement("img");
+        moreInfoImage.src = "Button Design-03.webp"; // Replace with the path to your green button PNG image
+        moreInfoImage.id = "more-info-img";
+        moreInfoImage.addEventListener("click", () => {
+          window.open('https://pso-pocketguide.vercel.app/?animation=6&link=link2', '_blank'); // Open index.html with the 6th animation
+        });
+        document.body.appendChild(moreInfoImage);
+
+        // Create the top-left images (stacked)
+        const topLeftImage1 = document.createElement("img");
+        topLeftImage1.src = "Button Design-01.webp"; // Replace with the path to your PNG image
+        topLeftImage1.classList.add("top-left");
+        topLeftImage1.style.top = "10px"; // First image position
+        document.body.appendChild(topLeftImage1);
+
+        const topLeftImage2 = document.createElement("img");
+        topLeftImage2.src = "Button Design-02.webp"; // Replace with the path to your PNG image
+        topLeftImage2.classList.add("top-left");
+        topLeftImage2.style.top = "70px"; // Second image position (stacked below the first)
+        document.body.appendChild(topLeftImage2);
+
+        // Create the top-right images
+        const topRightImage1 = document.createElement("img");
+        topRightImage1.src = "Button Design-04.webp"; // Replace with the path to your PNG image
+        topRightImage1.classList.add("top-right");
+        topRightImage1.style.top = "10px"; // First image position
+        document.body.appendChild(topRightImage1);
+
+        const topRightImage2 = document.createElement("img");
+        topRightImage2.src = "Button Design-05.webp"; // Replace with the path to your PNG image
+        topRightImage2.classList.add("top-right");
+        topRightImage2.style.top = "70px"; // Second image position (stacked below the first)
+        document.body.appendChild(topRightImage2);
+
+        const start = async() => {
+          const mindarThree = new window.MINDAR.IMAGE.MindARThree({
+            container: document.body,
+            imageTargetSrc: 'carient_plus.mind',
+          });
+          const {renderer, scene, camera} = mindarThree;
+
+          const light = new THREE.HemisphereLight( 0xffffff, 0xbbbbff, 1 );
+          scene.add(light);
+
+          const gltf = await loadGLTF('plus_blender.glb');
+          gltf.scene.scale.set(0.1,0.1,0.1);
+          gltf.scene.position.set(0, -0.4, 0);
+
+          const anchor = mindarThree.addAnchor(0);
+          anchor.group.add(gltf.scene);
+
+          const mixer = new THREE.AnimationMixer(gltf.scene);
+          const action = mixer.clipAction(gltf.animations[0]);
+          action.play();
+
+          const clock = new THREE.Clock();
+
+          // Show top buttons when the target is found
+          anchor.onTargetFound = () => {
+            document.querySelectorAll('.top-left, .top-right').forEach((button) => {
+              button.style.display = 'block';
+            });
+          };
+
+          // Hide top buttons when the target is lost
+          anchor.onTargetLost = () => {
+            document.querySelectorAll('.top-left, .top-right').forEach((button) => {
+              button.style.display = 'none';
+            });
+          };
+          
+          // Variables for mouse drag rotation
+          let isDragging = false;
+          let previousMouseX = 0;
+          const rotationSpeed = 0.01; // Adjust rotation speed as needed
+
+          // Add event listeners for mouse drag rotation
+          document.addEventListener('mousedown', (event) => {
+            isDragging = true;
+            previousMouseX = event.clientX;
+          });
+
+          document.addEventListener('mousemove', (event) => {
+            if (isDragging) {
+              const deltaX = event.clientX - previousMouseX;
+              gltf.scene.rotation.y += deltaX * rotationSpeed; // Rotate along Y-axis
+              previousMouseX = event.clientX;
+            }
+          });
+
+          document.addEventListener('mouseup', () => {
+            isDragging = false;
+          });
+
+          // Add touch event listeners for mobile devices
+          document.addEventListener('touchstart', (event) => {
+            isDragging = true;
+            previousMouseX = event.touches[0].clientX;
+          });
+
+          document.addEventListener('touchmove', (event) => {
+            if (isDragging) {
+              const deltaX = event.touches[0].clientX - previousMouseX;
+              gltf.scene.rotation.y += deltaX * rotationSpeed; // Rotate along Y-axis
+              previousMouseX = event.touches[0].clientX;
+            }
+          });
+
+          document.addEventListener('touchend', () => {
+            isDragging = false;
+          });
+
+          // Add event listener to pause/resume animation on tap/click
+          document.addEventListener('click', (event) => {
+            // Prevent pausing if the user is dragging
+            if (!isDragging) {
+              action.paused = !action.paused; // Toggle paused state
+            }
+          });
+
+          document.addEventListener('touchstart', (event) => {
+            // Prevent pausing if the user is dragging
+            if (!isDragging) {
+              action.paused = !action.paused; // Toggle paused state
+            }
+          });
+
+
+          await mindarThree.start();
+          renderer.setAnimationLoop(() => {
+            const delta = clock.getDelta();
+            mixer.update(delta);
+            renderer.render(scene, camera);
+          });
+        };
+        start();
+      });
+    </script>
+  </body>
+</html>
