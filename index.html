@@ -66,6 +66,7 @@
         const lubricantImage = document.createElement("img");
         lubricantImage.src = "b6.webp"; // Replace with the path to your PNG image
         lubricantImage.id = "lubricant-finder-img";
+        lubricantImage.loading = "lazy"; // Add lazy loading
         lubricantImage.addEventListener("click", () => {
           window.location.href = "https://psopk.com/en/lubricants/lubricant-finder";
         });
@@ -75,6 +76,7 @@
         const moreInfoImage = document.createElement("img");
         moreInfoImage.src = "b3.webp"; // Replace with the path to your green button PNG image
         moreInfoImage.id = "more-info-img";
+        moreInfoImage.loading = "lazy"; // Add lazy loading
         moreInfoImage.addEventListener("click", () => {
           window.open('https://pso-pocketguide.vercel.app/?animation=6&link=link2', '_blank'); // Open index.html with the 6th animation
         });
@@ -84,12 +86,14 @@
         const topLeftImage1 = document.createElement("img");
         topLeftImage1.src = "b1.webp"; // Replace with the path to your PNG image
         topLeftImage1.classList.add("top-left");
+        topLeftImage1.loading = "lazy"; // Add lazy loading
         topLeftImage1.style.top = "10px"; // First image position
         document.body.appendChild(topLeftImage1);
 
         const topLeftImage2 = document.createElement("img");
         topLeftImage2.src = "b2.webp"; // Replace with the path to your PNG image
         topLeftImage2.classList.add("top-left");
+        topLeftImage2.loading = "lazy"; // Add lazy loading
         topLeftImage2.style.top = "70px"; // Second image position (stacked below the first)
         document.body.appendChild(topLeftImage2);
 
@@ -97,12 +101,14 @@
         const topRightImage1 = document.createElement("img");
         topRightImage1.src = "b4.webp"; // Replace with the path to your PNG image
         topRightImage1.classList.add("top-right");
+        topRightImage1.loading = "lazy"; // Add lazy loading
         topRightImage1.style.top = "10px"; // First image position
         document.body.appendChild(topRightImage1);
 
         const topRightImage2 = document.createElement("img");
         topRightImage2.src = "b5.webp"; // Replace with the path to your PNG image
         topRightImage2.classList.add("top-right");
+        topRightImage2.loading = "lazy"; // Add lazy loading
         topRightImage2.style.top = "70px"; // Second image position (stacked below the first)
         document.body.appendChild(topRightImage2);
 
@@ -198,7 +204,6 @@
               action.paused = !action.paused; // Toggle paused state
             }
           });
-
 
           await mindarThree.start();
           renderer.setAnimationLoop(() => {
